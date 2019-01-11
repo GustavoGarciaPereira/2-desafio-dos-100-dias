@@ -5,16 +5,39 @@ import './index.css';
 class Squere extends React.Component{
     render(){
         return(
-            <button className="square">
+            <button 
+            className="square" 
+            onClick={() => {this.props.onClick()}}>
+             {this.props.value}
             </button>
         );
     }
 }
 
 class Board extends React.Component{
-    renderSquare(i){
-        return <Squere />;
+    constructor(props){
+        super(props);
+        this.state = {
+            squares: Array(9).fill(null),
+        };
     }
+
+    renderSquare(i){
+        return (
+        <Squere
+            value = {this.state.squares[i]}
+            onClick = {() => this.handleClick(i)} 
+        />
+        );
+    }
+
+    handleClick(i){
+        const squares = this.state.squares.slice();
+        squares[i] = 'X';
+        this.setState({squares: squares});
+
+    }
+
     render(){
         const status = "Proximo Jogador: X";
         return(
