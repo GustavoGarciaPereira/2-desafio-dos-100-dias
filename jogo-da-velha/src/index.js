@@ -2,16 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Squere extends React.Component{
-    render(){
-        return(
-            <button 
-            className="square" 
-            onClick={() => {this.props.onClick()}}>
-             {this.props.value}
-            </button>
-        );
-    }
+function Squere(props){
+    return(
+        <button 
+        className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
 }
 
 class Board extends React.Component{
@@ -19,6 +16,7 @@ class Board extends React.Component{
         super(props);
         this.state = {
             squares: Array(9).fill(null),
+            xIsNext: true,
         };
     }
 
@@ -33,13 +31,26 @@ class Board extends React.Component{
 
     handleClick(i){
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({squares: squares});
+        if(vencedor(squares) || squares[i]){
+            return;
+        }
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            squares: squares,
+            xIsNext : !this.state.xIsNext
+        });
 
     }
 
     render(){
-        const status = "Proximo Jogador: X";
+        //const status = "Proximo Jogador: "+(this.state.xIsNext ? 'X': 'O');
+        const qVencedor = vencedor(this.state.squares);
+        let status;
+        if(qVencedor){
+            status = 'Vencedor: '+qVencedor;
+        }else{
+            status =  "Proximo Jogador: "+(this.state.xIsNext ? 'X': 'O');
+        }
         return(
             <div>
                 <div className="status">{status}</div>
@@ -74,6 +85,25 @@ class Game extends React.Component{
     }
 }
 
+function vencedor(squares){
+    const linhas = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,4,8],
+        [2,4,6],
+        [0,3,6],
+        [1,4,6],
+        [2,5,8],
+    ];
+    for(let i = 0; i < linhas.length; i++){
+        const [a, b, c] = linhas[i];
+        if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]){
+            return squares[a]; 
+        }
+    }
+    return null;
+}
 ReactDOM.render(
     <Game />,
     document.getElementById('root')
